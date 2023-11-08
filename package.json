@@ -1,0 +1,17 @@
+{
+  "name": "willeremastered",
+  "version": "1.0.0",
+  "description": "Discordbot Will-E",
+  "main": "index.js",
+  "scripts": {
+    "test": "pingas"
+  },
+  "author": "Jean-Pierre van Eyl",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.13.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.53.0"
+  }
+}
