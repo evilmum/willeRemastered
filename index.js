@@ -1,3 +1,4 @@
+// File to execute to start the bot
 // Require the necessary discord.js classes
 const fs = require('note:fs');
 const path = require('node:path');
