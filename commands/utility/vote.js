@@ -22,7 +22,7 @@ module.exports = {
                 .setMinValue(1)
                 .setMaxValue(1440)),
     async execute(interaction) {
-        const question = interaction.options.getString('question');
+        const question = `"${interaction.options.getString('question')}"`;
         const numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
         const options = [];
 
@@ -49,11 +49,14 @@ module.exports = {
         reply += ` | *Time: ${remainingTime.value}*\n----------`;
         reply += `\n${question}\n`;
 
-        reactions = [];
 
-        for (let i = 0; i < options.length; i++) {
-            reply += `\n${numbers[i]} : ${options[i]}\n`;
-            reactions.push(numbers[i]);
+        if (options.length > 0) {
+            reactions = [];
+
+            for (let i = 0; i < options.length; i++) {
+                reply += `\n${numbers[i]} : ${options[i]}\n`;
+                reactions.push(numbers[i]);
+            }
         }
 
         reply += '----------';
@@ -116,20 +119,22 @@ module.exports = {
                 }
             }
 
-            if (options.length === 1) {
+            if (options.length === 0) {
                 if (result[0].reactionCount > result[1].reactionCount) {
                     edit += '\n✅ | ';
                 } else {
-                    edit += '\n❎ | ';
+                    edit += '\n❌ | ';
                 }
 
-                edit += `${options[0]}\n`;
+                edit += `${question}\n`;
             } else {
+                edit += `\n${question}\n`;
+
                 for (let l = 0; l < result.length; l++) {
                     if (result[l].reactionCount === highestCount && highestCount !== 0) {
                         edit += '\n✅ | ';
                     } else {
-                        edit += '\n❎ | ';
+                        edit += '\n❌ | ';
                     }
                     edit += `${numbers[l]} : ${options[l]}\n`;
                 }
