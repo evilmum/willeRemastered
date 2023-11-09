@@ -41,6 +41,7 @@ module.exports = {
 			}
 		}
 		msg = ''.concat(tex, '\n', hp);
+		msg = 'WILL NUR WISSEN OB GIT LÄUFT';
 		await interaction.reply(msg);
 	},
 };
