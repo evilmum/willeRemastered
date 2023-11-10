@@ -9,7 +9,9 @@
   "author": "Jean-Pierre van Eyl",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.13.0"
+    "axios": "^1.6.1",
+    "discord.js": "^14.13.0",
+    "node": "^21.1.0"
   },
   "devDependencies": {
     "eslint": "^8.53.0"
