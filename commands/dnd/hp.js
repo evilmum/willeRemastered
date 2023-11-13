@@ -28,9 +28,6 @@ module.exports = {
 		hp = hp + interaction.options.getInteger('hitdie');
 		for (let i = 0; i < (interaction.options.getInteger('level') - 1); i++) {
 			roll = Math.floor((Math.random() * interaction.options.getInteger('hitdie')) + 1);
-			if (roll > 1 && (roll + 1 <= interaction.options.getInteger('hitdie'))) {
-				roll++;
-			}
 			if (roll == 1) {
 				i--;
 				tex = tex + '~~' + roll + '~~' + ' ';
