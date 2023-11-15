@@ -4,27 +4,36 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('roll')
 		.setDescription('Rolls x dice of your choice')
-		.addIntegerOption(option =>
-			option.setName('die')
-				.setDescription('The amount of sides on the die to roll')
-				.setMinValue(1)
-				.setMaxValue(1000))
-		.addIntegerOption(option =>
-			option.setName('dieamount')
-				.setDescription('the amount of dice to roll')
-				.setMinValue(1)
-				.setMaxValue(100)),
+		.addStringOption(option =>
+			option.setName('formula')
+				.setDescription('The roll formula <amount>d<die> (e.g. "1d20")')),
 	async execute(interaction) {
-		const die = interaction.options.getInteger('die') ?? 20;
-		const dieamount = interaction.options.getInteger('dieamount') ?? 1;
-		let tex = 'Rolling ' + dieamount + ' d' + die + ' : \n\n';
+		const formula = interaction.options.getString('formula');
+		const regex = /^\d*d\d*$/;
+
+		let amount = 1;
+		let die = 20;
+
+		if (formula) {
+			const stringAmount = /^\d+d/.exec(formula);
+			const stringDie = /d\d+$/.exec(formula);
+
+			if (stringAmount) {
+				amount = Number(stringAmount[0].slice(0, -1));
+			}
+			if (stringDie) {
+				die = Number(stringDie[0].slice(1));
+			}
+		}
+
+		let tex = 'Rolling ' + amount + ' d' + die + ' : \n\n';
 		let total = 0;
-		for (let i = 0; i < dieamount; i++) {
+		for (let i = 0; i < amount; i++) {
 			roll = Math.floor((Math.random() * die) + 1);
 			tex = tex + roll + ' ';
 			total += roll;
 		}
-		if (dieamount == 1) {
+		if (amount == 1) {
 			await interaction.reply(tex);
 		}else {
 			msg = ''.concat(tex, '\n', 'Total: ' + total);
