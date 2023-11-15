@@ -15,7 +15,7 @@ module.exports = {
         const reply = await interaction.fetchReply();
 
         try {
-            const browser = await puppeteer.launch({ headless: 'new' });
+            const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: 'new', executablePath: '/usr/bin/chromium-browser' });
             const page = await browser.newPage();
 
             await page.goto('https://app.yamnam.com/menu/finkenkrug', { timeout: 5000 }).catch((error) => {
