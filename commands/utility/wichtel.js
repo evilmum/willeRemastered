@@ -76,7 +76,7 @@ module.exports = {
 					});
 					interaction.reply(`Der Partner für ${interaction.user.username} ist ${partner}!`)
 				}, function() {
-							interaction.reply(`Das ziehen eines Partners ist noch nicht Freigegeben. Aktuell ist noch Phase des Eintragens. Der Admin wird sie darauf hinweisen, sobald es Freigegeben ist.`);
+							interaction.reply(`Das ziehen eines Partners ist noch nicht freigegeben. Aktuell ist noch Phase des Eintragens. Der Admin wird sie darauf hinweisen, sobald es freigegeben ist.`);
 				});
 			}
 		
