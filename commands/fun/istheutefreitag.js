@@ -7,7 +7,7 @@ module.exports = {
 	async execute(interaction) {
         const date = new Date();
 
-        if (date.getDay === 5) {
+        if (date.getDay() === 5) {
             await interaction.reply('Ja!');
         } else {
             await interaction.reply('Nein!');
