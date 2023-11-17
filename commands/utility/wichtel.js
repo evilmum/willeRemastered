@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { mysqluser, mysqlpw, mysqldb } = require('/home/discordbot/config.json');
+const { mysqluser, mysqlpw, mysqldb } = require('../../config.json');
 
 
 module.exports = {
