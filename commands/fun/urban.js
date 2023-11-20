@@ -6,11 +6,11 @@ const axios = requestHandler.create({
 });
 
 module.exports = {
-    data: new SlashCommandBuilder()
+  data: new SlashCommandBuilder()
     .setName('urban')
     .setDescription('Explains an urban term.')
-    .addStringOption(option => 
-        option.setName('term')
+    .addStringOption(option =>
+      option.setName('term')
         .setDescription('The term to be explained')
         .setRequired(true)
     ),
@@ -38,9 +38,7 @@ module.exports = {
 
       for (let i = 0; i < data.results.length; i++) {
         if (data.results[i].term.toLowerCase() === term.toLowerCase()) {
-          console.log(urlSuffix);
           urlSuffix = data.results[i].term.replace(/\s/, '%20');
-          console.log(urlSuffix);
           break;
         }
       }
@@ -48,9 +46,10 @@ module.exports = {
 
     async function sendReply(interaction, response, term) {
       const data = await response.data;
+      let foundDefinition = false;
+      let reply = `**${term}:**\nI have no idea what that is.`;
 
       if (data.list.length > 0) {
-        let definition;
         let dataItem = {
           definition: '',
           thumbs_up: 0,
@@ -58,6 +57,7 @@ module.exports = {
           example: '',
           thumbs_down: 0
         }
+
         let current;
 
         for (let i = 0; i < data.list.length; i++) {
@@ -68,21 +68,22 @@ module.exports = {
             (current.thumbs_up - current.thumbs_down) > (dataItem.thumbs_up - dataItem.thumbs_down)
           ) {
             dataItem = current;
+            foundDefinition = true;
           }
         }
 
-        definition = `**${dataItem.word}:**\n${dataItem.definition.replace(/(?<!\\)[\[\]]/g, "")}`;
+        if (foundDefinition) {
+          reply = `**${dataItem.word}:**\n${dataItem.definition.replace(/(?<!\\)[\[\]]/g, "")}`;
 
-        if (dataItem.example) {
-          definition += `\n\n*${dataItem.example}*`;
+          if (dataItem.example) {
+            reply += `\n\n*${dataItem.example}*`;
+          }
+
+          reply = reply.replace(/(?<!\\)[\[\]]/g, "");
         }
-
-        definition = definition.replace(/(?<!\\)[\[\]]/g, "");
-
-        await interaction.reply(definition);
-      } else {
-        await interaction.reply(`**${term}:**\nI have no idea what that is.`);
       }
+
+      await interaction.reply(reply);
     }
   }
 }
