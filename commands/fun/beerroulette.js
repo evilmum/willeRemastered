@@ -80,14 +80,8 @@ async function execute(interaction) {
 }
 
 async function fetchBeers() {
-    // REMEMBER TO SWITCH TO CORRECT OS!!!
-    // const browser = await puppeteer.launch({ headless: 'new' }); // WINDOWS
     const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: 'new', executablePath: '/usr/bin/chromium-browser' }); // LINUX
-<<<<<<< HEAD
-
-=======
     
->>>>>>> New-Features
     const page = await browser.newPage();
     const categories = ['Fassbiere', 'Flaschenbiere', 'Dosenbiere', 'Cider'];
 
