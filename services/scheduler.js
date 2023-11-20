@@ -2,8 +2,10 @@
 //const source = require('../../index.js');
 //const { mysqluser, mysqlpw, mysqldb } = require('../../config.json');
 
+const cron = require('node-cron');
+const beerRoulette = require('../commands/fun/beerroulette.js');
 
-setInterval(() => {
-	//Function for setInterval
-	console.log(`Pingas`);
-}, 5000);
+// Beerroulette pull
+cron.schedule('0 0 4 * * *', () => {
+	beerRoulette.fetchBeers();
+})
