@@ -48,4 +48,9 @@ for (const file of eventFiles) {
 	}
 }
 
+
+// Scheduling
+require('./services/scheduler.js');
+
+
 client.login(token);
