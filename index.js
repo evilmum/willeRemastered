@@ -16,7 +16,7 @@ const client = new Client({
 		Partials.Reaction
 	],
 });
-// TEST
+// Ich tu so als würde ich Bugs fixen
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
