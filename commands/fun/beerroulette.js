@@ -80,8 +80,10 @@ async function execute(interaction) {
 }
 
 async function fetchBeers() {
-    const browser = await puppeteer.launch({ headless: 'new' }); // WINDOWS
-    //const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: 'new', executablePath: '/usr/bin/chromium-browser' }); // LINUX
+    // REMEMBER TO ALWAYS SWITCH TO CORRECT OS!!!
+    // const browser = await puppeteer.launch({ headless: 'new' }); // WINDOWS
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: 'new', executablePath: '/usr/bin/chromium-browser' }); // LINUX
+    
     const page = await browser.newPage();
     const categories = ['Fassbiere', 'Flaschenbiere', 'Dosenbiere', 'Cider'];
 
