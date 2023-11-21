@@ -22,7 +22,6 @@ module.exports = {
 
 		con.connect(function(err) {
 			if (err) throw err;
-			let tested = "";
 			let promise = new Promise(function(resolve, reject) {
 				con.query(`SELECT * FROM test WHERE id = '1'`, function (err, result, fields) {
 					if (err) throw err;
