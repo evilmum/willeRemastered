@@ -7,5 +7,9 @@ const beerRoulette = require('../commands/fun/beerroulette.js');
 
 // Beerroulette pull
 cron.schedule('0 0 4 * * *', () => {
-	beerRoulette.fetchBeers();
+	try {
+		beerRoulette.fetchBeers();
+	} catch (error) {
+		console.log(error);
+	}
 })
