@@ -75,7 +75,7 @@ module.exports = {
 				promise.then(function () {
 					con.query(`INSERT INTO groupwatch (title, progress, completed) VALUES ("${interaction.options.getString('titlecreate')}", 0, false )`, function (err, result) {
 						if (err) throw err;
-						interaction.reply(`${interaction.options.getString('titlecreate')} wurde erfolgreich eingetragen!`);
+						interaction.reply(`${interaction.options.getString('titlecreate')} wurde erfolgreich mit ID ${result.insertId} eingetragen!`);
 					});
 				}, function () {
 					interaction.reply(`${interaction.options.getString('titlecreate')} ist bereits für einen Groupwatch eingetragen!`);
