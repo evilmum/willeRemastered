@@ -55,25 +55,26 @@ module.exports = {
 			} else if (interaction.options.getSubcommand('pull')) {
 				let promise = new Promise(function (resolve, reject) {
 
-					/* con.query(`SELECT * FROM Wichteln WHERE id = "${interaction.user.id}"`, function (err, result, fields) {
+					con.query(`SELECT * FROM Wichteln WHERE id = "${interaction.user.id}"`, function (err, result, fields) {
 						if (err) throw err;
 						if (result.length != 0) {
+							if (result[0].has_pulled == true) {
+								reject(`Du hast schon einen Partner!`);
+							}
 							resolve();
-						} else if (result[0].has_pulled == true){
-							reject(`Du hast schon einen Partner!`);
 						} else {
 							reject(`Du bist nicht Teil der Wichtelgruppe!`);
 						}
-					}); */
+					});
 
-					con.query(`SELECT * FROM Wichteln WHERE id = "0"`, function (err, result, fields) {
+					/* con.query(`SELECT * FROM Wichteln WHERE id = "0"`, function (err, result, fields) {
 						if (err) throw err;
 						if (result.length != 0) {
 							reject(`Das ziehen eines Partners ist noch nicht freigegeben. Aktuell ist noch Phase des Eintragens. Der Admin wird sie darauf hinweisen, sobald es freigegeben ist.`);
 						} else {
 							resolve();
 						}
-					});
+					}); */
 				});
 				promise.then(function () {
 					let partner = "";
@@ -90,26 +91,45 @@ module.exports = {
 					});
 					promise.then(function () {
 						partner = "Alina";
-						con.query(`UPDATE Wichteln SET been_pulled = true WHERE name = "${partner}"`, function (err, result) {
-							if (err) throw err;
+						let promiseA = new Promise(function (resolve) {
+							con.query(`UPDATE Wichteln SET been_pulled = true WHERE name = "${partner}"`, function (err, result) {
+								if (err) throw err;
+							});
 						});
-						con.query(`UPDATE Wichteln SET has_pulled = true WHERE id = "${interaction.user.id}"`, function (err, result) {
-							if (err) throw err;
+						let promiseB = new Promise(function (resolve) {
+							con.query(`UPDATE Wichteln SET has_pulled = true WHERE id = "${interaction.user.id}"`, function (err, result) {
+								if (err) throw err;
+							});
 						});
 
 					}, async function () {
-						con.query(`SELECT * FROM Wichteln WHERE id != "${interaction.user.id}" AND been_pulled = false`, function (err, result, fields) {
-							if (err) throw err;
-							partner = result[Math.floor((Math.random() * result.length))].name;
+						/* let fknbs = new Promise(function (resolve) {
+							con.query(`SELECT * FROM Wichteln WHERE id != "${interaction.user.id}" AND been_pulled = false`, function (err, result, fields) {
+								if (err) throw err;
+								partner = result[Math.floor((Math.random() * result.length))].name;
+								console.log(`Partner: ${partner}`);
+								resolve(partner);
+							});
+						}); */
+
+						var partner = await new Promise(function (resolve) {
+							con.query(`SELECT * FROM Wichteln WHERE id != "${interaction.user.id}" AND been_pulled = false`, function (err, result, fields) {
+								if (err) throw err;
+								partner = result[Math.floor((Math.random() * result.length))].name;
+								resolve(partner);
+							});
 						});
+						console.log(`Partner: ${partner}`);
 						con.query(`UPDATE Wichteln SET been_pulled = true WHERE name = "${partner}"`, function (err, result) {
 							if (err) throw err;
+							console.log(`UPDATE Wichteln SET been_pulled = true WHERE name = "${partner}"`);
 						});
 						con.query(`UPDATE Wichteln SET has_pulled = true WHERE id = "${interaction.user.id}"`, function (err, result) {
 							if (err) throw err;
 						});
-						await interaction.reply({ content: `Der Partner für ${interaction.user.username} ist ${partner}!`, ephemeral: true });
+						interaction.reply({ content: `Der Partner für ${interaction.user.username} ist ${partner}!`, ephemeral: true });
 					});
+
 				}, function (reason) {
 					interaction.reply(`${reason}`);
 				});
