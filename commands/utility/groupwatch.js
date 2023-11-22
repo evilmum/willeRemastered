@@ -13,7 +13,10 @@ module.exports = {
 				.addStringOption(option =>
 					option.setName('titlecreate')
 						.setDescription('The title of the Movie/Series')
-						.setRequired(true)))
+						.setRequired(true))
+				.addBooleanOption(option =>
+					option.setName('autojoin')
+						.setDescription('Do you want to join immediately')))
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('join')
@@ -62,21 +65,37 @@ module.exports = {
 			if (err) throw err;
 
 			if (interaction.options.getSubcommand() === 'create') {
+				let autojoin = interaction.options.getBoolean('autojoin') ?? true;
 				let promise = new Promise(function (resolve, reject) {
 					con.query(`SELECT * FROM groupwatch WHERE title="${interaction.options.getString('titlecreate')}"`, function (err, result, fields) {
 						if (err) throw err;
 						if (result.length != 0) {
 							reject();
 						} else {
-							resolve();
+							resolve(autojoin);
 						}
 					});
 				});
-				promise.then(function () {
-					con.query(`INSERT INTO groupwatch (title, progress, completed) VALUES ("${interaction.options.getString('titlecreate')}", 0, false )`, function (err, result) {
-						if (err) throw err;
-						interaction.reply(`${interaction.options.getString('titlecreate')} wurde erfolgreich mit ID ${result.insertId} eingetragen!`);
+				promise.then(async function (autojoin) {
+					var joinid = await new Promise(function (resolve) {
+						con.query(`INSERT INTO groupwatch (title, progress, completed) VALUES ("${interaction.options.getString('titlecreate')}", 0, false )`, function (err, result) {
+							if (err) throw err;
+							resolve(result.insertId);
+						});
 					});
+					if (autojoin) {
+						var pingas = await new Promise(function (resolve) {
+							con.query(`UPDATE groupwatch SET audience = "${interaction.user.username}" WHERE id = ${joinid}`, function (err, result, fields) {
+								if (err) throw err;
+								resolve(null);
+							});
+						});
+					}
+					if (autojoin) {
+						interaction.reply(`${interaction.options.getString('titlecreate')} wurde erfolgreich mit ID ${joinid} eingetragen und ${interaction.user.username} wurde hinzugefügt!`);
+					} else {
+						interaction.reply(`${interaction.options.getString('titlecreate')} wurde erfolgreich mit ID ${joinid} eingetragen!`);
+					}
 				}, function () {
 					interaction.reply(`${interaction.options.getString('titlecreate')} ist bereits für einen Groupwatch eingetragen!`);
 				});
@@ -87,7 +106,7 @@ module.exports = {
 						if (result.length == 0) {
 							reject(`Groupwatch mit id ${interaction.options.getInteger('idjoin')} existiert nicht`);
 						} else if (result[0].audience.includes(interaction.user.username)) {
-							reject(`${interaction.user.username} ist bereits für diesen Groupwatch eingetragen`);
+							reject(result);
 						} else if (result[0].completed == true) {
 							reject(`Groupwatch mit Titel ${interaction.options.getString('titleid')} ist bereits beendet. L Bozo`);
 						} else {
@@ -108,7 +127,20 @@ module.exports = {
 					});
 					interaction.reply(`${interaction.user.username} wurde für ${result[0].title} eingetragen!`)
 				}, function (reason) {
-					interaction.reply(`${reason}`);
+					if (Array.isArray(reason)) {
+						let watcher = "";
+						watcher = reason[0].audience;
+						watcher2 = reason[0].audience.replace(`,${interaction.user.username}`, "");
+						if (watcher == watcher2) {
+							watcher2 = reason[0].audience.replace(`${interaction.user.username}`, "");
+						}
+						con.query(`UPDATE groupwatch SET audience = "${watcher2}" WHERE id = ${reason[0].id}`, function (err, result, fields) {
+							if (err) throw err;
+						});
+						interaction.reply(`${interaction.user.username} wurde für ${reason[0].title} ausgetragen!`)
+					} else {
+						interaction.reply(`${reason}`);
+					}
 				});
 			} else if (interaction.options.getSubcommand() === 'list') {
 				let promise = new Promise(function (resolve, reject) {
