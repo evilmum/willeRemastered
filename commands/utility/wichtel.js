@@ -101,10 +101,8 @@ module.exports = {
 								resolve(partner);
 							});
 						});
-						console.log(`Partner: ${partner}`);
 						con.query(`UPDATE Wichteln SET been_pulled = true WHERE name = "${partner}"`, function (err, result) {
 							if (err) throw err;
-							console.log(`UPDATE Wichteln SET been_pulled = true WHERE name = "${partner}"`);
 						});
 						con.query(`UPDATE Wichteln SET has_pulled = true WHERE id = "${interaction.user.id}"`, function (err, result) {
 							if (err) throw err;
