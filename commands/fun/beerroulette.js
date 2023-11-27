@@ -3,6 +3,8 @@ const puppeteer = require('puppeteer');
 const { mysqluser, mysqlpw, mysqldb } = require('../../config.json');
 const mysql = require('mysql');
 
+const args = process.argv.slice(2);
+
 const data = new SlashCommandBuilder()
     .setName('beerroulette')
     .setDescription('Provides a random beer you can order at Finkenkrug Duisburg.')
@@ -81,9 +83,9 @@ async function execute(interaction) {
 
 async function fetchBeers() {
     // REMEMBER TO ALWAYS SWITCH TO CORRECT OS!!!
-    // const browser = await puppeteer.launch({ headless: 'new' }); // WINDOWS
+    //const browser = await puppeteer.launch({ headless: 'new' }); // WINDOWS
     const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: 'new', executablePath: '/usr/bin/chromium-browser' }); // LINUX
-    
+
     const page = await browser.newPage();
     const categories = ['Fassbiere', 'Flaschenbiere', 'Dosenbiere', 'Cider'];
 
@@ -101,50 +103,52 @@ async function fetchBeers() {
     con.connect(async (err) => {
         if (err) throw err;
 
-        // Delete all beers
-        await new Promise((resolve) => {
-            con.query(`DELETE FROM beer;`, (err, result) => {
-                resolve();
-                if (err) throw err;
-            });
-        });
-
         for (let category of categories) {
             // Wait for category
             const htmlCategory = await page.waitForSelector(`#${category}`).catch((error) => console.log(error));
             const htmlBeerList = await htmlCategory.$$('sal-menu-item mat-card.item');
 
-            // Extract each beer
-            for (let htmlBeer of htmlBeerList) {
-                //Expand beer
-                const expandButton = await htmlBeer.waitForSelector('mat-icon.mat-icon');
-                await expandButton.evaluate(el => el.click());
-                await htmlBeer.waitForSelector('.body', { timeout: 5000 });
-
-                const beerId = Math.floor(Math.random() * 10000000) + 10000000;
-                const beerName = await htmlBeer.$eval('.dotted-description-content-wm', el => el.innerText.replaceAll("'", '"'));
-                const beerDesc = await htmlBeer.$eval('.body .dotted-description-content', el => el.innerText.replaceAll("'", '"'));
-
+            if (htmlBeerList.length > 0) {
+                // Delete all beers
                 await new Promise((resolve) => {
-                    con.query(`INSERT INTO beer VALUES(${beerId}, '${beerName}', '${beerDesc}', '${category}')`, (err, result) => {
+                    con.query(`DELETE FROM beer WHERE category = '${category}';`, (err, result) => {
                         resolve();
                         if (err) throw err;
                     });
                 });
 
-                const htmlPriceList = await htmlBeer.$$('.variant-container');
-                const priceList = [];
+                // Extract each beer
+                for (let htmlBeer of htmlBeerList) {
+                    //Expand beer
+                    const expandButton = await htmlBeer.waitForSelector('mat-icon.mat-icon');
+                    await expandButton.evaluate(el => el.click());
+                    await htmlBeer.waitForSelector('.body', { timeout: 5000 });
 
-                for (let htmlPrice of htmlPriceList) {
-                    const amount = await htmlPrice.$eval('.variant-name', el => el.innerText.replaceAll("'", '"'));
-                    const price = await htmlPrice.$eval('.variant-price', el => el.innerText.replaceAll("'", '"'));
+                    const beerId = Math.floor(Math.random() * 10000000) + 10000000;
+                    const beerName = await htmlBeer.$eval('.dotted-description-content-wm', el => el.innerText.replaceAll("'", '"'));
+                    const beerDesc = await htmlBeer.$eval('.body .dotted-description-content', el => el.innerText.replaceAll("'", '"'));
 
                     await new Promise((resolve) => {
-                        con.query(`INSERT INTO beer_price VALUES(${beerId}, '${amount}', '${price}')`, (err, result) => {
+                        con.query(`INSERT INTO beer VALUES(${beerId}, '${beerName}', '${beerDesc}', '${category}')`, (err, result) => {
                             resolve();
                             if (err) throw err;
                         });
                     });
+
+                    const htmlPriceList = await htmlBeer.$$('.variant-container');
+                    const priceList = [];
+
+                    for (let htmlPrice of htmlPriceList) {
+                        const amount = await htmlPrice.$eval('.variant-name', el => el.innerText.replaceAll("'", '"'));
+                        const price = await htmlPrice.$eval('.variant-price', el => el.innerText.replaceAll("'", '"'));
+
+                        await new Promise((resolve) => {
+                            con.query(`INSERT INTO beer_price VALUES(${beerId}, '${amount}', '${price}')`, (err, result) => {
+                                resolve();
+                                if (err) throw err;
+                            });
+                        });
+                    }
                 }
             }
         }
@@ -153,6 +157,10 @@ async function fetchBeers() {
 
         console.log('...fetched all beers!');
     });
+}
+
+if (args[0] === '-fetch') {
+    fetchBeers();
 }
 
 module.exports = {
