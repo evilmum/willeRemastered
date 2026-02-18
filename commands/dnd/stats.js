@@ -44,15 +44,6 @@ module.exports = {
         points[2] = Math.floor(Math.random() * 6 + 1);
         points[3] = Math.floor(Math.random() * 6 + 1);
 
-        if (name == "evilmum") {
-          for (let i = 0; i < points.length; i++) {
-            if (points[i] < 6) {
-              points[i]++;
-            }
-          }
-          points[Math.floor(Math.random() * 4)]--;
-        }
-
         alls = points[0] + points[1] + points[2] + points[3];
         min = Math.min.apply(Math, points);
         total = alls - min;
