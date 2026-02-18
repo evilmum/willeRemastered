@@ -16,7 +16,7 @@ echo "Deleting old commands..." | tee -a $LOG
 node delete-commands.js | tee -a $LOG
 
 echo "Deploying new commands..." | tee -a $LOG
-node deploy-commands.js | tee -a $LOG
+node global-deploy-commands.js | tee -a $LOG
 
 # Restart the bot
 echo "Restarting bot..." | tee -a $LOG
