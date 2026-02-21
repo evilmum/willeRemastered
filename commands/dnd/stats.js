@@ -49,14 +49,6 @@ module.exports = {
         min = Math.min.apply(Math, points);
         total = alls - min;
 
- 	if (name == "evilmum") {
-	  if (total < 17 && total > 7) {
-	    total+=2;
-	  }
-        } else {
-	    msg = msg.concat("n\n");
-	}
-
         sum = sum + total;
         stats[i] = total;
       }
