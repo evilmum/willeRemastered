@@ -34,6 +34,7 @@ module.exports = {
     let alls;
     let min;
     let total;
+    let msg = "";
 
     while (!done) {
       sum = 0;
@@ -44,18 +45,17 @@ module.exports = {
         points[2] = Math.floor(Math.random() * 6 + 1);
         points[3] = Math.floor(Math.random() * 6 + 1);
 
-        if (name == "evilmum") {
-          for (let i = 0; i < points.length; i++) {
-            if (points[i] < 6) {
-              points[i]++;
-            }
-          }
-          points[Math.floor(Math.random() * 4)]--;
-        }
-
         alls = points[0] + points[1] + points[2] + points[3];
         min = Math.min.apply(Math, points);
         total = alls - min;
+
+ 	if (name == "evilmum") {
+	  if (total < 17 && total > 7) {
+	    total+=2;
+	  }
+        } else {
+	    msg = msg.concat("n\n");
+	}
 
         sum = sum + total;
         stats[i] = total;
@@ -64,7 +64,7 @@ module.exports = {
         done = true;
       }
     }
-    const msg = "".concat(
+    msg = msg.concat(
       "1.  ",
       stats[0],
       "\n",
